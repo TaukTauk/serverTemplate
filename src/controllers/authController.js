@@ -24,6 +24,21 @@ const loginUser = async (req, res) => {
 			});
 		}
 
+		const updatedUser = await User.findOneAndUpdate(
+			{ _id: user._id },
+			{ last_login: Date.now() },
+			{ new: true }
+		);
+
+		if (!updatedUser) {
+			return res.status(500).json({
+				success: false,
+				devMessage: "Server error",
+				message: "Server error",
+				result: {},
+			});
+		}
+
 		const token = generateToken(user._id);
 		return res.status(200).json({
 			success: true,
@@ -35,7 +50,8 @@ const loginUser = async (req, res) => {
 					name: user.name,
 					email: user.email,
 					role: user.role,
-					profile_url: user.profile_url
+					profile_url: user.profile_url,
+					last_login: user.last_login
 				},
 				token
 			 },
